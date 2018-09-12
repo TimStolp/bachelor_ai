@@ -1,0 +1,82 @@
+%%%%%%%%%%%%%%%%
+%% Preambule  %%
+%%%%%%%%%%%%%%%%
+
+% De preambule bestaat uit alles tot aan het '\begin{document}' commando. Doorgaans staan hier commando's die op het hele bestand van toepassing zijn. Voor nu staan er alvast wat pakketten en commando's die handig zijn voor later.
+
+\documentclass[11pt]{article}         
+
+\usepackage{amsmath,amsfonts,amssymb} 
+\usepackage{upgreek}                  
+\usepackage{enumerate}             
+\usepackage{multicol}    
+\usepackage{fitch}
+\usepackage[all]{xy}                
+\usepackage{tikz-qtree}               
+\usepackage[margin=2.5cm]{geometry} 
+
+\usepackage{fancyhdr}             
+\usepackage{lastpage}               
+\setlength{\parindent}{0pt}        
+
+\pagestyle{fancy}                 
+
+\lhead{\opdrachtNaam\ \opdrachtNummer}           
+\rhead{\naam(\studentNummer)}               
+\rfoot{Pagina\ \thepage\ van\ \pageref{LastPage}}
+\lfoot{\datum}                              
+\cfoot{}                                        
+
+\renewcommand\headrulewidth{0.4pt}  
+\renewcommand\footrulewidth{0.4pt}
+
+\newcommand{\E}{\exists} 
+\newcommand{\A}{\forall}
+
+\newcommand{\ccen}[2]{\llap{$#1$}${}\mathrel{\circ}{}$\rlap{$#2$}}
+
+%%%%%%%%%%%%%
+%%  Titel  %%
+%%%%%%%%%%%%%
+
+% Zie thuisopdracht.
+
+%%%%%%%%%%%%%%
+%% Gegevens %%
+%%%%%%%%%%%%%%
+
+% Vul hier je gegevens in.
+
+\newcommand{\naam}          {Tim Stolp}
+\newcommand{\studentNummer} {11848782}
+\newcommand{\opdrachtNaam}  {Huiswerk}
+\newcommand{\opdrachtNummer}{3}
+\newcommand{\datum}         {20-11-17}
+
+%%%%%%%%%%%%%%%%
+%% Antwoorden %%
+%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\section*{Opgave 5.31}
+
+
+\begin{fitch}
+\fh A A A & Assumption \\
+\fa B B B & Main Proof Step \\
+\fa C C C & Another Main Proof Step\\
+\fa \fh D D D & New Assumption \\
+\fa \fa E E E & Subproof Step \\
+\fa \fa F F F & Another Subproof Step \\
+\fa G G G & Main Proof Step \\
+\fa H H H & Main Proof Step
+\end{fitch}
+
+
+
+
+
+
+\end{document} 
+
