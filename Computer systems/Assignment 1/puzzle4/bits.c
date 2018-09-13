@@ -177,6 +177,9 @@ int fitsShort(int x) {
  *   Rating: 2
  */
 int anyEvenBit(int x) {
+  /*
+   * Create a mask with 1s on even numbered bits, do int & mask, if result not 0 then int has at least one 1 on even numbered.
+   */
   return !!(x & (((0x55 ^ 0x55 << 8) ^ 0x55 << 16) ^ 0x55 << 24));
 }
 /* 
@@ -187,6 +190,9 @@ int anyEvenBit(int x) {
  *   Rating: 3
  */
 int isLess(int x, int y) {
+  /*
+   * check if x is neg and y is pos, if yes OR check if not x pos and y neg and if x-y is negative, if either true return 1
+   */
   return (!!((x&1 << 31)&(~y&1 << 31))) | (!((~x&1 << 31)&(y&1 << 31)) & !!((x+(~y+1))& 1 << 31));
 }
 /* 
@@ -198,6 +204,10 @@ int isLess(int x, int y) {
  *   Rating: 4 
  */
 int greatestBitPos(int x) {
+    /*
+     * make all bits right of leading 1 to 1s, neg x and shift 1 to right, then & with x to get 1 on leading 1 place and the rest 0 as result (or all 0 if int was negative)
+     * then if original int was negative flip first bit to 1
+     */
     x = x|x>>1;
     x = x|x>>2;
     x = x|x>>4;
@@ -218,5 +228,51 @@ int greatestBitPos(int x) {
  *   Rating: 4
  */
 int float_f2i(unsigned uf) {
-  return 2;
+    /*
+     * get the different parts of the float, put 1 in front of frac
+     */
+    int frac = uf & 0x7FFFFF;
+    int exp = (uf >> 23) & 0xFF;
+    int e = exp - 127;
+    frac = frac | 0x800000;
+    /*
+     * if float(unasigned int) 0 return 0
+     */
+    if(!uf){
+        return 0;
+    }
+    /*
+     * NaN if out of range for int
+     */
+    if(e > 31){
+        return 0x80000000u;
+    }
+    /*
+     * if e < 0 answer will be number below 0, put in int is 0
+     */
+    if(e < 0) {
+        return 0;
+    }
+    /*
+     * if exp 0 return 0
+     */
+    if(!exp){
+        return 0;
+    }
+    /*
+     *shift dot to right spot
+     */
+    if(e > 22){
+        frac = frac << (e-23);
+    }
+    else {
+        frac = frac >> (23-e);
+    }
+    /*
+     * if float was negative make int negative
+     */
+    if((uf&1<<31)){
+        return ~frac + 1;
+    }
+  return frac;
 }
