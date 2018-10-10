@@ -1,0 +1,170 @@
+\documentclass[11pt]{article}
+
+\usepackage{times}
+%\usepackage{url}
+\usepackage{comment}
+\usepackage{hyperref}
+\usepackage{verbatimbox}
+\usepackage{xcolor}
+\usepackage{listings}
+%\lstdefinelanguage
+%   [x64]{Assembler}     % add a "x64" dialect of Assembler
+%   [x86masm]{Assembler} % based on the "x86masm" dialect
+%   % with these extra keywords:
+%   {morekeywords={CDQE,CQO,CMPSQ,CMPXCHG16B,JRCXZ,LODSQ,MOVSXD, %
+%                  POPFQ,PUSHFQ,SCASQ,STOSQ,IRETQ,RDTSCP,SWAPGS, %
+%                  rax,rdx,rcx,rbx,rsi,rdi,rsp,rbp, %
+%                  r8,r8d,r8w,r8b,r9,r9d,r9w,r9b, %
+%                  r10,r10d,r10w,r10b,r11,r11d,r11w,r11b, %
+%                  r12,r12d,r12w,r12b,r13,r13d,r13w,r13b, %
+%                  r14,r14d,r14w,r14b,r15,r15d,r15w,r15b}} % etc.
+%
+%\lstset{language=[x64]Assembler,
+%			  frame=tb,             
+%             breaklines=true,
+%             tabsize=3}
+
+\newcommand \question[1]{\textcolor{red}{#1}}
+
+%\urlstyle{same}
+
+%% Page layout
+\oddsidemargin 0pt
+\evensidemargin 0pt
+\textheight 600pt
+\textwidth 469pt
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1ex}
+
+\begin{document}
+
+\title{Computer Systems\\
+Fall 20178\\
+Lab Assignment 2: Reducing the Cache Miss Rate for Matrix Transpose\\
+Assigned: October 2, Due: October 10, 20:00. 
+}
+
+\author{Student 1, Student 2}
+\date{}
+
+\maketitle
+
+%REQUIREMENTS
+% Answer the questions specifically. No need for long answers, it is the content that matters. 
+% Leave the questions in the text, in red. 
+% Try to match your answers with the structure of the document and the text introducing the answer. If that is not possible, tweak as little as possible of the two (structure, introductory text) to have a readable document. 
+% The PDF document resulting after the compilation of the Latex file must be submitted. In case there are compilation errors or problems with the PDF, the .tex can be submitted as well. 
+% Please name your files - .tex, .pdf - as "Report_BombLab_xxxxx_yyyyy.tex" and/or "Report_DataLab_xxxxx_yyyyy.pdf", where xxxxxx and yyyyyy are the students numbers of the two students in the team.  
+
+%TIPS AND HINTS
+% - If you cannot answer a question, explain why not. E.g.: if the question asks "describe a general solution" and you have no general solution, please specify that in your answer: " No general solution was found. We intended to try X and Y and Z, but failed because A or B or C. Therefore, each problem was dealt with separately. Some of the solutions we have used are: solution 1, soluiton 2, ... "  
+% - The question expect you to have had a certain process and take certain steps. If there's anything that was not necessary, or a step you have not done/taken, please do not simply skip the question. Instead, comment on why you think that step was not necessary. 
+% Do not be afraid to "tweak" the given text to better fit your approach, but don't forget that the structure and questions are posed such that you get a brief, but comprehensive report. Thus, think and explain WHY the changes were needed. 
+
+%- what was needed in the code to implement blocking?
+%- are all blocking configurations (i.e., sizes) the same, performance wise?
+%- could you compute the most efficient tile size?
+%- is there a space-time trade-off when we talk about tiling/blocking?
+%- briefly explain (pseudo-code) the implementation for the 32x32
+%- what was different for the 64x64 matrix - conceptually? Why was the
+%change needed?
+%- what was different for the asymmetrical matrix? Why was the change
+%needed?
+
+\section{Introduction}
+The goal of this lab is to illustrate the challenges in writing cache-friendly code. Specifically, it focuses on improving the cache performance of a given application - matrix transpose - by improving the locality of its memory accesses. 
+
+The lab is setup as follows: a "naive form" of matrix transposition is given, and it requires modification to reduce the number of cache misses for three specific matrix sizes: 32 x 32, 64 x 64, 61 x 67.  
+
+This report aims to describe the process of cache performance improvement, including the general approach, the challenges for each different version of the application, and a short discussion on the lessons learned.  
+
+\section{Background} \label{sec:background}
+In this section we briefly introduce the necessary background and tools used for completing his lab. 
+%Please fill in the questions explicitly.  
+
+\subsection*{Matrix transposition} 
+Matrix transposition is an operation where the elements of a matrix are re-written in a different order, and has its main uses in linear algebra, and further in data analysis or computer graphics. The transformation is defined as follows: given a matrix $A$, of dimensions $M \times N$, and the transposed matrix $A^T$, of dimensions $N \times M$, $A^T_{i,j} = A_{j,i}, \forall i \in [1,N], j=[1,M]$. 
+
+\subsection*{The Memory Hierarchy and Caching}
+According to Bryant and O'Hallaron: "In practice, a memory system is a hierarchy of storage devices with different capacities, costs, and access times. CPU registers hold the most frequently used data. Small, fast cache memories nearby the CPU act as staging areas for a subset of the data and instructions stored in the relatively slow main memory." 
+
+Caches improve performance because of the principle of locality, which states that: 
+\question{Q1 (0.5p): Please state the principle of locality, and briefly explain the two different types of locality. Please note: in case you quote from a different source, you MUST use quotes and reference(s) accordingly. }
+
+In this lab, we focus on the caches that serve the main memory, i.e., caches that work as an intermediate buffer between the CPU and main memory. Any memory access is, from the perspective of the cache, a \textbf{hit} - when the required data in already in the cache, or a \textbf{miss} - when the data is not in the cache. Furthermore, misses are further categorizes as: \textit{cold}, \textit{conflict}, and \textit{capacity}, depending on why the data is missing from the cache. 
+
+The performance of a cache is judged in terms of its hit ratio - i.e., the number of accesses to the memory that end up as cache hits. A program with good locality will have a high hit ratio, which will translates in a high number of accesses to the cache, which are fast, and a low number of accesses to the main memory, which are slow.   
+
+There are three commonly-known cache organizations:
+\question{Q2 (0.5p): Please briefly introduce/define the three well-known cache organizations, and state pro's and con's for each.}
+\begin{enumerate}
+\item ... 
+\item ... 
+\item ... 
+\end{enumerate}
+
+In this lab, we will focus on the L1 cache - i.e., the closest to the CPU - which is a direct mapped cache (i.e., E=1), with 32 sets (i.e., s = 5) and 32 bytes lines (i.e., b=5).  
+
+\subsection*{Valgrind}
+"Valgrind is an instrumentation framework for building dynamic analysis tools"\footnote{Valgrind: \url {http://valgrind.org/}}, i.e., it can automatically  instrument applications' code and allow for different data to be collected and analyzed to help understand a program's behavior and/or performance. For this lab, we use the cache profiler of Valgrind, which simulates the working of a given cache for a given application, and produces a detailed \textit{trace of cache accesses}. By analysing this trace, one can see what has happened with the cache after every memory access. Such a fine-grained analysis may enable the performance engineer to improve the locality of the application, thus improving the hit ratio of the cache, which further improves the overall application performance.  
+
+\subsection*{Blocking/Tiling} 
+\question{Q3 (0.5p): Please explain what is tiling and how it can be achieved. Again, in case you quote other sources, bibliography references and, if necessary, quotes, must be used. }
+
+In this lab, we will improve the performance of matrix transposition by using tiling as a main technique. 
+ 
+\section{Approach and challenges}
+In this section we describe the general strategy we have devised to approach cache-performance optimization, and we further dive into the details of each of the three different matrix transposition exercises (i.e., sizes $32 \times 32$, $64 \times 64$, and $61 \times 67$).
+
+\subsection*{General approach}
+The core of the matrix transposition application is the following loop:
+\begin{lstlisting} [language=C]
+for (i=0; i<N; i++) 
+   for (j=0; j<N; j++) 
+   	   AT [i,j] = A[j,i];
+\end{lstlisting}
+
+The main idea behind the cache-performance improvement in this lab is improving the locality of the application. To do so, we will reorder the memory accesses of the loops presented above. We will use two different techniques: tiling (as explained in Section~\ref{sec:background}) and buffering, which means using registers as temporary buffers to delay memory operations. .
+
+The generic strategy to implement tiling is: 
+\question{Q4 (0.5p): Please explain, potentially using pseudocode, what was needed in the code to implement blocking?}
+
+After tiling, the performance of the new application depends on ... 
+\question{Q5 (1.0p): Please comment on the impact of tiling on performance: are all tiling configurations (i.e., sizes) the same, performance wise? Is there a space-time tradeoff here?} 
+
+\question{Q6 (1.0p): How can you compute the best tiling configuration for your application? Can you derive a formula to be used as an analytical model (i.e., an equation which, when you fill in the specific parameters of the problem at hand, can automatically compute the tile size) ? }
+
+\subsection*{Solving the $32 \times 32$ transpose}
+\question{Q7 (1.0p): Please briefly explain (with pseudo-code, too) the implementation for the $32 \times 32$ configuration. Clearly identify the tiling and the buffering.}  
+
+\subsection*{Solving the $61 \times 67$ transpose}
+\question{Q8 (1.5p): Please briefly explain (with pseudo-code, too) the implementation for the $61 \times 67$ configuration. Clearly identify the tiling and the buffering. Please explain the difference(s) with the previous case. What was different - conceptually? Why was the change needed?}  
+
+\subsection*{Solving the $64 \times 64$ transpose}
+\question{Q9 (1.5p): Please briefly explain (with pseudo-code, too) the implementation for the $64 \times 64$ configuration. Clearly identify the tiling and the buffering. Please explain the difference(s) with the previous case. What was different - conceptually? Why was the change needed?}  
+
+\section{Summary and Future Work }
+In this lab, we have improve the cache performance of matrix transposition by reordering its the memory accesses. To do so, we used a technique called tiling, and buffering (using registers). 
+ 
+\subsection*{Lessons Learned} 
+\question{Q10 (1.0p): What have you learned during this lab? Focus on your own knowledge and experience, and new skills (i..e, avoid "standard" statements). Consider both lab components: valgrind as a tool and tiling as a technique. } 
+
+\subsection*{Future work}
+While we have improved the cache hit ratio, this lab misses a validation of the correlation between cache performance and the actual performance of the application. To further determine this correlation, ....  
+\question{Q11(1.0p): How would you check whether the performance of the application had improved?} 
+
+Moreover, we have focused on three specific sizes of the matrices. However, these techniques can/cannot be generalized ... 
+\question{Q12 (1.0p): Please discuss the potential generalization of the techniques used in this lab: which ones can be generalized, if any, and how?} 
+
+\appendix
+
+%\section{Tools, additional information}
+
+%\section{Suggested improvements for the lab/exercises}
+
+%HINT: Uncomment the following lines to add a bibliography, only if needed.
+%\bibliographystyle{plain}
+%\bibliography{your_bib_file} 
+
+
+\end{document}
