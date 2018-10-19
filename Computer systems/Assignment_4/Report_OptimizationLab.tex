@@ -1,0 +1,120 @@
+\documentclass[11pt]{article}
+
+\usepackage{times}
+%\usepackage{url}
+\usepackage{comment}
+\usepackage{hyperref}
+\usepackage{verbatimbox}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\newcommand \question[1]{\textcolor{red}{#1}}
+
+%\urlstyle{same}
+
+%% Page layout
+\oddsidemargin 0pt
+\evensidemargin 0pt
+\textheight 600pt
+\textwidth 469pt
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1ex}
+
+\begin{document}
+
+\title{Computer Systems\\
+baiCOSY06, Fall 2017\\
+Lab Assignment : Optimizing Text Similarity Analysis \\
+Assigned: October 12, Due: October 19, 20:00. 
+}
+
+\author{Student 1, Student 2}
+\date{}
+
+\maketitle
+
+%REQUIREMENTS
+% Answer the questions specifically. No need for long answers, it is the content that matters. 
+% Leave the questions in the text, in red. 
+% Try to match your answers with the structure of the document and the text introducing the answer. If that is not possible, tweak as little as possible of the two (structure, introductory text) to have a readable document. 
+% The PDF document resulting after the compilation of the Latex file must be submitted. In case there are compilation errors or problems with the PDF, the .tex can be submitted as well. 
+% Please name your files - .tex, .pdf - as "Report_BombLab_xxxxx_yyyyy.tex" and/or "Report_DataLab_xxxxx_yyyyy.pdf", where xxxxxx and yyyyyy are the students numbers of the two students in the team.  
+
+%TIPS AND HINTS
+% - If you cannot answer a question, explain why not. E.g.: if the question asks "describe a general solution" and you have no general solution, please specify that in your answer: " No general solution was found. We intended to try X and Y and Z, but failed because A or B or C. Therefore, each problem was dealt with separately. Some of the solutions we have used are: solution 1, soluiton 2, ... "  
+% - The question expect you to have had a certain process and take certain steps. If there's anything that was not necessary, or a step you have not done/taken, please do not simply skip the question. Instead, comment on why you think that step was not necessary. 
+% Do not be afraid to "tweak" the given text to better fit your approach, but don't forget that the structure and questions are posed such that you get a brief, but comprehensive report. Thus, think and explain WHY the changes were needed. 
+
+\section{Introduction}
+The goal of this lab is threefold. First, the exercises prove how different ways to improve the performance work in practice. 
+Second, to learn about the most common forms of concurency found in most machines today: SIMD and multi-threading. 
+Third, to learn about performance variabiltity in practice, trying to see how different elements (compilers, flags, the way we right code, etc) impact performance. 
+
+The lab is setup as follows: three code versions are provided, and the all need to be improved such that the overall performance of the application is maximized. The three versions are originally independent, but they can also build on top of each other. Each code focuses on a specific set of performance optimization techniques: optimizing sequential code, using SIMD to increase the efficiency in exploring ILP and the SIMD units in the CPU, and, finally, using multiple threads to make efficient, explicit use of the multiple cores existing in the processor. 
+
+This report is a description of the techniques and results obtained in each phase. Thus, for each phase, we report: ideas at design level (i.e., what are possible optimizations), implementation details (i.e., how were they implemented), a brief effectiveness analysis (i.e., analysing whether they work or not, by assessing how much improvement they achieved, and why), and ideas for future work. 
+
+\section{Performance optimization for the sequential code}
+
+\subsection{Background}
+\question{Q1. Briefly explain known techniques to improve the performance of the sequential code.}
+
+\subsection{Design: useful optmizations for k\_nearest}
+\question{Q2. Describe the optimizations you thought would have worked for k\_nearest, at conceptual level, and why they should have worked. Very brief.}
+
+\subsection{Implementation and results}
+%Note: you can either present all optimizations and all results, or interleave, making each optimization followed by its own results. 
+
+\question{Q3. Describe (in detail, with pseudocode when needed) how you have implemented the different optimizations you have tried, one by one.}
+\question{Q4. Describe and analyze how the performance was impacted by each optimization. Please analyze all results, positive, neutral, or negative. That is: not only list the numbers, but attempt to reason whether they meet your expectations and, if not, why.}
+
+
+\section{Using SIMD}
+
+\subsection{Background}
+\question{Q5. Briefly explain what SIMD is and how it can be used to improve performance for sequential code.}
+
+\subsection{Design: SIMD for k\_nearest}
+\question{Q6. Describe the approach to SIMD for k\_nearest, at conceptual level, and why it should work. Specific SIMD challenges should be discussed.}
+
+\subsection{Implementation and results}
+%Note: you can either present all optimizations and all results, or interleave, making each optimization followed by its own results. 
+
+\question{Q7. Describe (in detail, with pseudocode when needed) how you have implemented SIMD, one by one.}
+\question{Q8. Describe and analyze how the performance was impacted by SIMD. Please analyze all results, positive, neutral, or negative. That is: not only list the numbers, but attempt to reason whether they meet your expectations and, if not, why.}
+
+
+\section{Using Multiple Threads}
+
+\subsection{Background}
+\question{Q9. Briefly explain what multi-threading is and how it can be used to improve application performance.}
+
+\subsection{Design: multi-threading for k\_nearest}
+\question{Q10. Describe the approach to multithreading for k\_nearest, at conceptual level, and why it should work. Specific multithreading challenges should be discussed.}
+
+\subsection{Implementation and results}
+%Note: you can either present all optimizations and all results, or interleave, making each optimization followed by its own results. 
+
+\question{Q11. Describe (in detail, with pseudocode when needed) how you have implemented multi-threading, one by one.}
+\question{Q12. Describe and analyze how the performance was impacted by multi-threading. Please analyze all results, positive, neutral, or negative. That is: not only list the numbers, but attempt to reason whether they meet your expectations and, if not, why.}
+
+\section{Conclusion and Future Work} 
+
+\subsection{Final results}
+\question{Q13. Briefly discuss your final, overall results, and provide a brief list of your interesting findings about code optimization. }
+
+\subsection*{Future work}
+\question{Q14: What are the next steps to improve the performance of the code even further? Or to improve the analysis? }
+
+\appendix
+
+%\section{Tools, additional information}
+
+%\section{Suggested improvements for the lab/exercises}
+
+%HINT: Uncomment the following lines to add a bibliography, only if needed.
+%\bibliographystyle{plain}
+%\bibliography{your_bib_file} 
+
+
+\end{document}
