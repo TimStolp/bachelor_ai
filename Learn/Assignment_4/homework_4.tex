@@ -1,0 +1,82 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{fullpage}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumerate}
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+\title{Leren --- Homework 4\\[3mm]\small{Chapter 9-10, Alpaydin}}
+\date{Deadline: 23:59 December 9th, 2018}
+
+\begin{document}
+
+\maketitle
+
+This is the sixth week's assignment for Leren.  This assignment covers
+chapters 9 \& 10 of Alpaydin. Please take note of the following:
+
+\begin{itemize}
+  \item You are expected to hand in your solutions in \LaTeX;
+  \item This problem set is an individual assignment;
+  \item The deadline for this assignment is Sunday, December 9th, 2018 at 23:59.
+\end{itemize}
+
+
+\section{Chapter 9: Decision Trees}
+
+Consider the training dataset given below. Based on this data, we would like to determine whether an example student is likely to succeed in an exam (represented by class variable $Y$). We make this decision solely based on two properties: whether the student is \textit{hard-working} (represented by variable $X_{1}$) and whether the student \textit{attends} all classes (represented by variable $X_{2}$). The `$+$' and `$-$' signs represent positive and negative classes, respectively.
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+Hard-working ($X_{1}$) & Attendance ($X_{2}$) &  Success ($Y$) \\ \hline
+Yes & Yes & $+$ \\ \hline
+Yes & No & $-$ \\ \hline
+Yes & No & $+$ \\ \hline
+Yes & Yes & $+$ \\ \hline
+No & Yes & $-$ \\ \hline
+\end{tabular}
+\end{center}
+
+
+\begin{enumerate}[(a)]
+\item Is it possible to find a decision tree with $100\%$ accuracy on this training set? If your answer is yes, draw the decision tree. If your answer is no, explain why.
+\item Compute the sample impurity $\gimel(Y)$ of the variable $Y$ (success) using the entropy measure with logarithmic base 2.
+\item Using entropy as a measure of the impurity in a collection of training examples, we define a measure of the effectiveness of an attribute in classifying the training data: The measure is called information gain and is the expected reduction in entropy caused by partitioning the examples according to this attribute.
+
+For this case, we can express the information gain $IG(X_{1})$ based on $X_{1}$ by computing the entropy of $Y$ after a split on $X_{1}$, given by $\gimel(Y|X_{1})$:
+\begin{align*}
+  		IG(X_{1}) = \gimel(Y) - \gimel(Y|X_{1})
+  	\end{align*}
+The same thing for $X_{2}$:
+\begin{align*}
+  		IG(X_{2}) = \gimel(Y) - \gimel(Y|X_{2})
+  	\end{align*}
+What are the information gains $IG(X_{1})$ and $IG(X_{2})$ for this sample of training data?
+\end{enumerate}
+
+\section{Chapter 10: Linear Discrimination}
+\subsection{Logistic Regression}
+Consider a binary classification ($K=2$ classes) model where it is given that
+\begin{align}
+  \log\frac{P(\mathbf{x}|\mathcal{C}_1)P(\mathcal{C}_1)}{P(\mathbf{x}|\mathcal{C}_2)P(\mathcal{C}_2)} = \mathbf{w}^T\mathbf{x} + w_0 \,,
+  \label{eq:logodds}
+\end{align}
+i.e.~the \textit{log odds} of $P(\mathcal{C}_1|\mathbf{x})$ is linear. This is for example the case for two normal classes sharing a common covariance: $P(\mathbf{x}|\mathcal{C}_1)=\mathcal{N}(\boldsymbol{\mu}_1,\boldsymbol{\Sigma})$ and $P(\mathbf{x}|\mathcal{C}_2)=\mathcal{N}(\boldsymbol{\mu}_2,\boldsymbol{\Sigma})$, and is independent of the choice for the class priors $P(\mathcal{C}_1)$ and $P(\mathcal{C}_2)$. Decision theory tells us that we should pick $\mathcal{C}_1$ if $P(\mathcal{C}_1|\mathbf{x})>P(\mathcal{C}_2|\mathbf{x})$, assuming a 0/1 loss.
+
+
+\begin{enumerate}[(a)]
+\item Simplify the left-hand side of Eq.~(\ref{eq:logodds}) to express it only in terms of $P(\mathcal{C}_1|\mathbf{x})$ and $P(\mathcal{C}_2|\mathbf{x})$.
+\item Solve for $P(\mathcal{C}_1|\mathbf{x})$. Hint, in the expression one can re-write $P(\mathcal{C}_2|\mathbf{x})$ as: $P(\mathcal{C}_2|\mathbf{x}) = 1 - P(\mathcal{C}_1|\mathbf{x})$.
+\item You can rewrite your result from (b) as $P(\mathcal{C}_1|\mathbf{x})=\sigma(\mathbf{a})$, where $\sigma(\mathbf{a})$ is the sigmoid function, defined as $\sigma(\mathbf{a})=\frac{1}{1+\exp{(-\mathbf{a})}}$. Provide an expression for $\mathbf{a}$ in terms of $\mathbf{x}$, $\mathbf{w}$ and $w_0$.
+\item What is the decision boundary in terms of $P(\mathcal{C}_1|\mathbf{x})$? Further provide the decision boundary in terms of the log odds of $P(\mathcal{C}_1|\mathbf{x})$, i.e.~in terms of $\mathbf{w}^T\mathbf{x} + w_0$. Provide your solution in the form: classify $\mathbf{x}$ as $\mathcal{C}_1$ if $P(\mathcal{C}_1|\mathbf{x})>a$ (or $\mathbf{w}^T\mathbf{x} + w_0>b$), where $a$ (or $b$) is a number.
+\end{enumerate}
+
+
+\subsection{Derivative of Softmax}
+
+Show that the derivate of the softmax, $y_{i} = \exp(a_{i}) / \sum_{j} \exp(a_{j})$ is $\partial y_{i} / \partial a_{j} = y_{i}(\delta_{ij} - y_{j})$, where $\delta_{ij}$ is $1$ if $i = j$ and $0$ otherwise. 
+
+\end{document}
