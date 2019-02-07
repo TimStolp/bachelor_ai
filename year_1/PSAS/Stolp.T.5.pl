@@ -48,7 +48,7 @@ evaluate_trialx([A|B], [C|D], E, [A|F], [C|G]):-
 
 evaluate_trialo(_, [], []).
 evaluate_trialo(A, [B|C], [o|D]):-
-  member(B, A),S
+  member(B, A),
   select(B, A, X),
   evaluate_trialo(X, C, D).
 evaluate_trialo(A, [_|C], D):-
