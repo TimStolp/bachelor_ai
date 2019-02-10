@@ -26,4 +26,10 @@ echo ''
 
 ## Add your own tests here
 
-# TODO
+./infix2rpn "~2*2^~3^4" 2> /dev/null
+echo ''
+
+./infix2rpn "(~23*(255^~333))^42" 2> /dev/null
+echo ''
+
+
