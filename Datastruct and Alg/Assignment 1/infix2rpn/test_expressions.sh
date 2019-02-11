@@ -25,11 +25,33 @@ echo ''
 
 
 ## Add your own tests here
+echo "### Own tests ###"
 
-./infix2rpn "~2*2^~3^4" 2> /dev/null
+echo "Input: (7+4)^5; Accurately counts number of pushes, pops and max. size."
+./infix2rpn "(7+4)^5"; echo $?
 echo ''
 
-./infix2rpn "(~23*(255^~333))^42" 2> /dev/null
+echo "Input: ~    2 *  (2 ^~  3 ) ^   4    ; Properly ignores spaces."
+./infix2rpn "~    2 *  (2 ^~  3 ) ^   4    "; echo $?
 echo ''
 
+echo "Input: (2*(2^3))^4; Handles parentheses correctly."
+./infix2rpn "(2*(2^3))^4"; echo $?
+echo ''
 
+echo "Input: 5+(5*(6-3); Detects improperly matched parentheses."
+./infix2rpn "5+(5*(6-3)" > /dev/null 2>&1; echo $?
+echo ''
+
+echo "Input: 5+(5*6)-3); Detects improperly matched parentheses."
+./infix2rpn "5+(5*6)-3)" > /dev/null 2>&1; echo $?
+echo ''
+
+echo "Input: 2*2^3^4; Handles right-associative exponentiation at a higher precedence level
+than multiplication correctly."
+./infix2rpn "2*2^3^4"; echo $?
+echo ''
+
+echo "Input: ~3+5^6^~(2-5); Supports unary negation."
+./infix2rpn "~3+5^6^~(2-5)"; echo $?
+echo ''
