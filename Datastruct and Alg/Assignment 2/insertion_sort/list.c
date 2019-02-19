@@ -80,6 +80,9 @@ int list_add_front(struct list* l, struct node* n) {
 }
 
 struct node* list_tail(struct list* l) {
+    if (l == NULL) {
+        return NULL;
+    }
     struct node* current = l->head;
     while (current->next != NULL) {
         current = current->next;
@@ -140,9 +143,6 @@ int list_unlink_node(struct list* l, struct node* n) {
 }
 
 void list_free_node(struct node* n) {
-    if (n == NULL) {
-        return 1;
-    }
     free(n);
 }
 
@@ -161,7 +161,14 @@ int list_cleanup(struct list* l) {
 }
 
 int list_node_present(struct list* l, struct node* n) {
-    ;
+    struct node* current = l->head;
+    while (current != NULL) {
+        if (current == n) {
+            return 1;
+        }
+        current = current->next;
+    }
+    return 0;
 }
 
 int list_insert_after(struct list* l, struct node* n, struct node* m) {
@@ -171,6 +178,9 @@ int list_insert_after(struct list* l, struct node* n, struct node* m) {
     struct node* current = l->head;
     while (current != m) {
         current = current->next;
+        if (current == NULL) {
+            return 1;
+        }
     }
     n->prev = current;
     n->next = current->next;
@@ -182,17 +192,68 @@ int list_insert_after(struct list* l, struct node* n, struct node* m) {
 }
 
 int list_insert_before(struct list* l, struct node* n, struct node* m) {
-    ;
+    if (l == NULL || n == NULL || m == NULL) {
+        return 1;
+    }
+    struct node* current = l->head;
+    while (current != m) {
+        current = current->next;
+        if (current == NULL) {
+            return 1;
+        }
+    }
+    n->next = current;
+    n->prev = current->prev;
+    if (current->prev != NULL) {
+        current->prev->next = n;
+    }
+    current->prev = n;
+    return 0;
 }
 
 int list_length(struct list* l) {
-    ;
+    if (l == NULL) {
+        return 0;
+    }
+    int len = 0;
+    struct node* current = l->head;
+    while (current != NULL) {
+        len++;
+        current = current->next;
+    }
+    return len;
 }
 
 struct node* list_get_ith(struct list* l, int i) {
-    ;
+    if (l == NULL) {
+        return NULL;
+    }
+    struct node* current = l->head;
+    for (int l = 1; l < i; l++) {
+        current = current->next;
+        if (current == NULL) {
+            break;
+        }
+    }
+    return current;
 }
 
 struct list* list_cut_after(struct list* l, struct node* n) {
-    ;
+    if (l == NULL || n == NULL) {
+        return NULL;
+    }
+    struct list* l2 = list_init();
+    struct node* current = l->head;
+    while (current != n) {
+        current = current->next;
+        if (current == NULL) {
+            return NULL;
+        }
+    }
+    l2->head = current->next;
+    if (current->next != NULL) {
+        current->next->prev = NULL;
+        current->next = NULL;
+    }
+    return l2;
 }
