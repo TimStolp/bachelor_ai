@@ -53,6 +53,32 @@ int parse_options(struct config *cfg, int argc, char *argv[]) {
     return 0;
 }
 
+// Read input and put input in a linked list.
+struct list* input_to_list(struct list* l) {
+    unsigned long int buf_end;
+    while (fgets(buf, BUF_SIZE, stdin)) {
+        // Remove trailing whitespaces.
+        buf_end = strlen(buf) - 1;
+        while (isspace(buf[buf_end])) {
+            buf[buf_end] = '\0';
+        }
+        // Check for invalid input.
+        for (unsigned int i = 0; i < strlen(buf); i++) {
+            if (!isdigit(buf[i]) && !isspace(buf[i]) && !(buf[i] == '-' && isdigit(buf[i+1]))) {
+                list_cleanup(l);
+                return NULL;
+            }
+        }
+        // Put input in linked list.
+        char * token = strtok(buf, " ");
+        while (token != NULL) {
+            list_add_back(l, list_new_node(atoi(token)));
+            token = strtok(NULL, " ");
+        }
+    }
+    return l;
+}
+
 
 int print_list(struct list* l) {
     if (l == NULL) {
@@ -69,15 +95,18 @@ int print_list(struct list* l) {
 
 
 struct list* insertion_sort(struct list* l, struct config cfg) {
+    if (list_length(l) < 2) {
+        return l;
+    }
     struct node* current_s = list_next(list_head(l));
     struct node* current_n, *current_r;
-    int int_one, int_two;
+    int int_one, int_two, int_three;
     // Go through all nodes (each node called current_s).
     while (current_s != NULL) {
         current_n = list_prev(l, current_s);
         // Go backwards through all nodes left of current node (each node called current_n).
         while (current_n != NULL) {
-            // Swap values of s and n in comparisons to sort list in descending order.
+            // Swap places of values of s and n in comparisons to sort list in descending order.
             if (cfg.descending_order) {
                 int_one = list_node_value(current_n);
                 int_two = list_node_value(current_s);
@@ -86,7 +115,7 @@ struct list* insertion_sort(struct list* l, struct config cfg) {
                 int_one = list_node_value(current_s);
                 int_two = list_node_value(current_n);
             }
-            // Check if values n and s are the same and remove s if so.
+            // Check if values n and s are the same and remove s if so and if -u argument was passed.
             if (cfg.unique_values && int_one == int_two) {
                 current_r = current_s;
                 current_s = list_next(current_s);
@@ -94,23 +123,20 @@ struct list* insertion_sort(struct list* l, struct config cfg) {
                 list_free_node(current_r);
                 break;
             }
-            // If end of list is reached check if new node has to be placed in front of list.
-            // If so, add new node with value of s in front of list and remove s from list.
+            // If end of list is reached check if s node has to be placed in front of list.
             if (list_prev(l, current_n) == NULL && int_one < int_two) {
                 current_r = current_s;
                 current_s = list_next(current_s);
-                list_add_front(l, list_new_node(list_node_value(current_r)));
                 list_unlink_node(l, current_r);
-                list_free_node(current_r);
+                list_add_front(l, current_r);
                 break;
             }
-            // Insert new node with value of s into correct place and remove s from list when correct place is found.
+            // Insert s in correct place.
             if (int_one >= int_two) {
                 current_r = current_s;
                 current_s = list_next(current_s);
-                list_insert_after(l, list_new_node(list_node_value(current_r)), current_n);
                 list_unlink_node(l, current_r);
-                list_free_node(current_r);
+                list_insert_after(l, current_r, current_n);
                 break;
             }
             current_n = list_prev(l, current_n);
@@ -138,49 +164,29 @@ struct list* zip(struct list* l) {
     struct list* l2;
     // Split l in 2 lists
     l2 = list_cut_after(l, list_get_ith(l, (int) round((float) len/2)));
+    struct node* current_r1, *current_r2;
     struct node* current_1 = list_head(l);
     struct node* current_2 = list_head(l2);
     struct list* zip_list = list_init();
     while (current_2 != NULL) {
-        // Add new nodes with values of the nodes in the 2 lists to a new list, alternating between the 2 lists.
-        list_add_back(zip_list, list_new_node(list_node_value(current_1)));
-        list_add_back(zip_list, list_new_node(list_node_value(current_2)));
+        // Add nodes of the 2 lists to a new list, alternating between the 2 lists.
+        current_r1 = current_1;
+        current_r2 = current_2;
         current_1 = list_next(current_1);
         current_2 = list_next(current_2);
+        list_unlink_node(l, current_r1);
+        list_add_back(zip_list, current_r1);
+        list_unlink_node(l2, current_r2);
+        list_add_back(zip_list, current_r2);
     }
     // Add last node of first half of list if halves are unequal length.
     if (len % 2 != 0) {
-        list_add_back(zip_list, list_new_node(list_node_value(current_1)));
+        list_unlink_node(l, current_1);
+        list_add_back(zip_list, current_1);
     }
     list_cleanup(l2);
     list_cleanup(l);
     return zip_list;
-}
-
-// Read input and put input in a linked list.
-struct list* input_to_list(struct list* l) {
-    unsigned long int buf_end;
-    while (fgets(buf, BUF_SIZE, stdin)) {
-        // Remove trailing whitespaces.
-        buf_end = strlen(buf) - 1;
-        while (isspace(buf[buf_end])) {
-            buf[buf_end] = '\0';
-        }
-        // Check for invalid input.
-        for (unsigned int i = 0; i < strlen(buf); i++) {
-            if (!isdigit(buf[i]) && !isspace(buf[i]) && !(buf[i] == '-' && isdigit(buf[i+1]))) {
-                list_cleanup(l);
-                return NULL;
-            }
-        }
-        // Put input in linked list.
-        char * token = strtok(buf, " ");
-        while (token != NULL) {
-            list_add_back(l, list_new_node(atoi(token)));
-            token = strtok(NULL, " ");
-        }
-    }
-    return l;
 }
 
 

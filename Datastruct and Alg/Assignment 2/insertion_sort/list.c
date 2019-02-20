@@ -128,6 +128,9 @@ int list_unlink_node(struct list* l, struct node* n) {
     if (l == NULL || n == NULL) {
         return 1;
     }
+    if (!list_node_present(l, n)) {
+        return 1;
+    }
     if (n->next != NULL) {
         n->next->prev = n->prev;
     }
@@ -175,19 +178,15 @@ int list_insert_after(struct list* l, struct node* n, struct node* m) {
     if (l == NULL || n == NULL || m == NULL) {
         return 1;
     }
-    struct node* current = l->head;
-    while (current != m) {
-        current = current->next;
-        if (current == NULL) {
-            return 1;
-        }
+    if (list_node_present(l, n) || !list_node_present(l, m)) {
+        return 1;
     }
-    n->prev = current;
-    n->next = current->next;
-    if (current->next != NULL) {
-        current->next->prev = n;
+    n->prev = m;
+    n->next = m->next;
+    if (m->next != NULL) {
+        m->next->prev = n;
     }
-    current->next = n;
+    m->next = n;
     return 0;
 }
 
@@ -195,19 +194,18 @@ int list_insert_before(struct list* l, struct node* n, struct node* m) {
     if (l == NULL || n == NULL || m == NULL) {
         return 1;
     }
-    struct node* current = l->head;
-    while (current != m) {
-        current = current->next;
-        if (current == NULL) {
-            return 1;
-        }
+    if (list_node_present(l, n) || !list_node_present(l, m)) {
+        return 2;
     }
-    n->next = current;
-    n->prev = current->prev;
-    if (current->prev != NULL) {
-        current->prev->next = n;
+    n->prev = m->prev;
+    n->next = m;
+    if (m->prev != NULL) {
+        m->prev->next = n;
     }
-    current->prev = n;
+    else {
+        l->head = n;
+    }
+    m->prev = n;
     return 0;
 }
 
@@ -242,13 +240,13 @@ struct list* list_cut_after(struct list* l, struct node* n) {
     if (l == NULL || n == NULL) {
         return NULL;
     }
+    if (!list_node_present(l, n)) {
+        return NULL;
+    }
     struct list* l2 = list_init();
     struct node* current = l->head;
     while (current != n) {
         current = current->next;
-        if (current == NULL) {
-            return NULL;
-        }
     }
     l2->head = current->next;
     if (current->next != NULL) {
