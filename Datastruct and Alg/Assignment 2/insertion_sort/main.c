@@ -100,7 +100,7 @@ struct list* insertion_sort(struct list* l, struct config cfg) {
     }
     struct node* current_s = list_next(list_head(l));
     struct node* current_n, *current_r;
-    int int_one, int_two, int_three;
+    int int_one, int_two;
     // Go through all nodes (each node called current_s).
     while (current_s != NULL) {
         current_n = list_prev(l, current_s);
@@ -163,7 +163,7 @@ struct list* zip(struct list* l) {
     int len = list_length(l);
     struct list* l2;
     // Split l in 2 lists
-    l2 = list_cut_after(l, list_get_ith(l, (int) round((float) len/2)));
+    l2 = list_cut_after(l, list_get_ith(l, (int) round((float) (len-2)/2)));
     struct node* current_r1, *current_r2;
     struct node* current_1 = list_head(l);
     struct node* current_2 = list_head(l2);

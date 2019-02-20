@@ -195,7 +195,7 @@ int list_insert_before(struct list* l, struct node* n, struct node* m) {
         return 1;
     }
     if (list_node_present(l, n) || !list_node_present(l, m)) {
-        return 2;
+        return 1;
     }
     n->prev = m->prev;
     n->next = m;
@@ -226,8 +226,11 @@ struct node* list_get_ith(struct list* l, int i) {
     if (l == NULL) {
         return NULL;
     }
+    if (i < 0) {
+        return NULL;
+    }
     struct node* current = l->head;
-    for (int l = 1; l < i; l++) {
+    for (int l = 0; l < i; l++) {
         current = current->next;
         if (current == NULL) {
             break;
