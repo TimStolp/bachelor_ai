@@ -1,3 +1,7 @@
+// Tim Stolp 11848782
+//
+// Creates doubly linked list API.
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -20,17 +24,19 @@
  * Also, do not forget to add any required includes at the top of your file.
  */
 
-
+// Create list structure.
 struct list {
     struct node* head;
 };
 
+// Create doubly linked node structure.
 struct node {
     struct node* next;
     struct node* prev;
     int val;
 };
 
+// Initialize list.
 struct list* list_init(void) {
     struct list* l = malloc(sizeof(struct list));
     if (l == NULL) {
@@ -40,6 +46,7 @@ struct list* list_init(void) {
     return l;
 }
 
+// Initialize new node.
 struct node* list_new_node(int num) {
     struct node* n = malloc(sizeof(struct node));
     if (n == NULL) {
@@ -51,6 +58,7 @@ struct node* list_new_node(int num) {
     return n;
 }
 
+// Get head of list.
 struct node* list_head(struct list* l) {
     if (l == NULL) {
         return NULL;
@@ -58,6 +66,7 @@ struct node* list_head(struct list* l) {
     return l->head;
 }
 
+// Get next node.
 struct node* list_next(struct node* n) {
     if (n == NULL) {
         return NULL;
@@ -65,6 +74,7 @@ struct node* list_next(struct node* n) {
     return n->next;
 }
 
+// Add node in front of list.
 int list_add_front(struct list* l, struct node* n) {
     if (l == NULL || n == NULL) {
         return 1;
@@ -79,6 +89,7 @@ int list_add_front(struct list* l, struct node* n) {
     return 0;
 }
 
+// Get last node of list.
 struct node* list_tail(struct list* l) {
     if (l == NULL) {
         return NULL;
@@ -90,6 +101,7 @@ struct node* list_tail(struct list* l) {
     return current;
 }
 
+// Get previous node.
 struct node* list_prev(struct list* l, struct node* n) {
     if (n == NULL) {
         return NULL;
@@ -100,6 +112,7 @@ struct node* list_prev(struct list* l, struct node* n) {
     return n->prev;
 }
 
+// Add node to back of list.
 int list_add_back(struct list* l, struct node* n) {
     if (l == NULL || n == NULL) {
         return 1;
@@ -117,6 +130,7 @@ int list_add_back(struct list* l, struct node* n) {
     return 0;
 }
 
+// Get node value.
 int list_node_value(struct node* n) {
     if (n == NULL) {
         return 0;
@@ -124,6 +138,7 @@ int list_node_value(struct node* n) {
     return n->val;
 }
 
+// Unlink node from list.
 int list_unlink_node(struct list* l, struct node* n) {
     if (l == NULL || n == NULL) {
         return 1;
@@ -145,10 +160,12 @@ int list_unlink_node(struct list* l, struct node* n) {
     return 0;
 }
 
+// Free node memory.
 void list_free_node(struct node* n) {
     free(n);
 }
 
+// Free all memory of list.
 int list_cleanup(struct list* l) {
     if (l == NULL) {
         return 1;
@@ -163,6 +180,7 @@ int list_cleanup(struct list* l) {
     return 0;
 }
 
+// Check if node is present in list.
 int list_node_present(struct list* l, struct node* n) {
     struct node* current = l->head;
     while (current != NULL) {
@@ -174,6 +192,7 @@ int list_node_present(struct list* l, struct node* n) {
     return 0;
 }
 
+// Insert node in list after another node.
 int list_insert_after(struct list* l, struct node* n, struct node* m) {
     if (l == NULL || n == NULL || m == NULL) {
         return 1;
@@ -190,6 +209,7 @@ int list_insert_after(struct list* l, struct node* n, struct node* m) {
     return 0;
 }
 
+// Insert node in list before another node.
 int list_insert_before(struct list* l, struct node* n, struct node* m) {
     if (l == NULL || n == NULL || m == NULL) {
         return 1;
@@ -209,6 +229,7 @@ int list_insert_before(struct list* l, struct node* n, struct node* m) {
     return 0;
 }
 
+// Get list length.
 int list_length(struct list* l) {
     if (l == NULL) {
         return 0;
@@ -222,6 +243,7 @@ int list_length(struct list* l) {
     return len;
 }
 
+// Get i'th node in list.
 struct node* list_get_ith(struct list* l, int i) {
     if (l == NULL) {
         return NULL;
@@ -239,6 +261,7 @@ struct node* list_get_ith(struct list* l, int i) {
     return current;
 }
 
+// Cut list in 2 halves and return second half.
 struct list* list_cut_after(struct list* l, struct node* n) {
     if (l == NULL || n == NULL) {
         return NULL;
