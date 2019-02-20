@@ -270,14 +270,10 @@ struct list* list_cut_after(struct list* l, struct node* n) {
         return NULL;
     }
     struct list* l2 = list_init();
-    struct node* current = l->head;
-    while (current != n) {
-        current = current->next;
-    }
-    l2->head = current->next;
-    if (current->next != NULL) {
-        current->next->prev = NULL;
-        current->next = NULL;
+    l2->head = n->next;
+    if (n->next != NULL) {
+        n->next->prev = NULL;
+        n->next = NULL;
     }
     return l2;
 }

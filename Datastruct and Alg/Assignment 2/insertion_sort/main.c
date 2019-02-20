@@ -66,6 +66,7 @@ struct list* input_to_list(struct list* l) {
         for (unsigned int i = 0; i < strlen(buf); i++) {
             if (!isdigit(buf[i]) && !isspace(buf[i]) && !(buf[i] == '-' && isdigit(buf[i+1]))) {
                 list_cleanup(l);
+                fprintf(stderr, "invalid input");
                 return NULL;
             }
         }
@@ -79,7 +80,7 @@ struct list* input_to_list(struct list* l) {
     return l;
 }
 
-
+// Print the linked list.
 int print_list(struct list* l) {
     if (l == NULL) {
         return 1;
@@ -93,60 +94,68 @@ int print_list(struct list* l) {
     return 0;
 }
 
+// Helper function for insertion sort.
+// Compares two ints, switching operator around if sorting descending.
+int compare(int one, int two, int equals, struct config cfg) {
+    if (equals) {
+        if (cfg.descending_order) {
+            return one <= two;
+        }
+        return one >= two;
+    }
+    if (cfg.descending_order) {
+        return one > two;
+    }
+    return one < two;
+}
 
-struct list* insertion_sort(struct list* l, struct config cfg) {
+// Sort list using insertion sort.
+// Possible to remove duplicate values.
+// Possible to sort descending.
+int insertion_sort(struct list* l, struct config cfg) {
     if (list_length(l) < 2) {
-        return l;
+        return 1;
     }
     struct node* current_s = list_next(list_head(l));
     struct node* current_n, *current_r;
-    int int_one, int_two;
     // Go through all nodes (each node called current_s).
     while (current_s != NULL) {
         current_n = list_prev(l, current_s);
         // Go backwards through all nodes left of current node (each node called current_n).
         while (current_n != NULL) {
-            // Swap places of values of s and n in comparisons to sort list in descending order.
-            if (cfg.descending_order) {
-                int_one = list_node_value(current_n);
-                int_two = list_node_value(current_s);
-            }
-            else {
-                int_one = list_node_value(current_s);
-                int_two = list_node_value(current_n);
-            }
             // Check if values n and s are the same and remove s if so and if -u argument was passed.
-            if (cfg.unique_values && int_one == int_two) {
+            if (cfg.unique_values && list_node_value(current_s) == list_node_value(current_n)) {
                 current_r = current_s;
                 current_s = list_next(current_s);
                 list_unlink_node(l, current_r);
                 list_free_node(current_r);
                 break;
             }
-            // If end of list is reached check if s node has to be placed in front of list.
-            if (list_prev(l, current_n) == NULL && int_one < int_two) {
+            // if s has to be moved insert s in correct place.
+            if (compare(list_node_value(current_n), list_node_value(current_s), 1, cfg) &&
+                (list_prev(l, current_n) == NULL ||
+                compare(list_node_value(list_prev(l, current_n)), list_node_value(current_s), 0, cfg))) {
                 current_r = current_s;
                 current_s = list_next(current_s);
                 list_unlink_node(l, current_r);
-                list_add_front(l, current_r);
+                list_insert_before(l, current_r, current_n);
                 break;
             }
-            // Insert s in correct place.
-            if (int_one >= int_two) {
-                current_r = current_s;
+            // Update s if no moving needs to be done.
+            if (list_prev(l, current_n) == NULL) {
                 current_s = list_next(current_s);
-                list_unlink_node(l, current_r);
-                list_insert_after(l, current_r, current_n);
-                break;
             }
             current_n = list_prev(l, current_n);
         }
     }
-    return l;
+    return 0;
 }
 
 // Add intermediate numbers between each 2 numbers in list.
-struct list* intermediate(struct list* l) {
+int intermediate(struct list* l) {
+    if (l == NULL) {
+        return 1;
+    }
     struct node* current;
     float num;
     current = list_head(l);
@@ -155,38 +164,27 @@ struct list* intermediate(struct list* l) {
         list_insert_after(l, list_new_node((int)round(num)), current);
         current = list_next(list_next(current));
     }
-    return l;
+    return 0;
 }
 
-// Split list in 2 and zip back together alternating between the 2 halves.
-struct list* zip(struct list* l) {
-    int len = list_length(l);
-    struct list* l2;
-    // Split l in 2 lists
-    l2 = list_cut_after(l, list_get_ith(l, (int) round((float) (len-2)/2)));
-    struct node* current_r1, *current_r2;
-    struct node* current_1 = list_head(l);
-    struct node* current_2 = list_head(l2);
-    struct list* zip_list = list_init();
-    while (current_2 != NULL) {
-        // Add nodes of the 2 lists to a new list, alternating between the 2 lists.
-        current_r1 = current_1;
-        current_r2 = current_2;
-        current_1 = list_next(current_1);
-        current_2 = list_next(current_2);
-        list_unlink_node(l, current_r1);
-        list_add_back(zip_list, current_r1);
-        list_unlink_node(l2, current_r2);
-        list_add_back(zip_list, current_r2);
+// Split list in 2 and zips back together.
+int zip(struct list* l) {
+    if (l == NULL) {
+        return 1;
     }
-    // Add last node of first half of list if halves are unequal length.
-    if (len % 2 != 0) {
-        list_unlink_node(l, current_1);
-        list_add_back(zip_list, current_1);
+    int len = list_length(l);
+    struct list *l2;
+    // Split l in 2 lists
+    l2 = list_cut_after(l, list_get_ith(l, (int) round((float) (len - 2) / 2)));
+    struct node* node, *current = list_head(l);
+    while (current != NULL) {
+        node = list_head(l2);
+        list_unlink_node(l2, node);
+        list_insert_after(l, node, current);
+        current = list_next(list_next(current));
     }
     list_cleanup(l2);
-    list_cleanup(l);
-    return zip_list;
+    return 0;
 }
 
 
@@ -206,16 +204,16 @@ int main(int argc, char *argv[]) {
     }
 
     // Sort the list using insertion sort.
-    l = insertion_sort(l, cfg);
+    insertion_sort(l, cfg);
 
     // Add intermediate numbers if argument is set.
     if (cfg.insert_intermediate) {
-        l = intermediate(l);
+        intermediate(l);
     }
 
     // Split list in 2 and zip them together.
     if (cfg.zip_alternating) {
-        l = zip(l);
+        zip(l);
     }
 
     // Print the sorted list.
