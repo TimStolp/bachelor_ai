@@ -1,7 +1,7 @@
 # A* algorithm to connect gates on a circuit board.
 
-To run the program you run __main__.py.
-In the __main__.py file you can adjust some settings to print the results of each solved netlist or print the netlist's circuit board.
+To run the program you run \_\_main\_\_.py.
+In the \_\_main\_\_.py file you can adjust some settings to print the results of each solved netlist or print the netlist's circuit board.
 
 ## Results
 This program does not work perfectly yet. Problems arise when gates are enclosed by previous wires and various attempts to counteract this failed.
