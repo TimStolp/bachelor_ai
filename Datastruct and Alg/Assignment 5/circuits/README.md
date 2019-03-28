@@ -4,10 +4,10 @@ To run the program you run __main__.py.
 In the __main__.py file you can adjust some settings to print the results of each solved netlist or print the netlist's circuit board.
 
 ## Results
-This program does not work perfectly yet. Problems arise when gates are enclosed by previous wires and attempts to counteract this failed.
-One possible solution was to increase the cost of places next to gates, but this either did not work or was not implemented correctly.
-Next to that the algorithm has a tendency to zigzag left and right sometimes when it could have gone straight.
-Also it sometimes ends up climbing all the way to the top layer and then going down again and then continuing from there.
+This program does not work perfectly yet. Problems arise when gates are enclosed by previous wires and various attempts to counteract this failed.
+One possible solution was to increase the cost of places next to gates, this gave a small improvement but did not fix it completely.
+Next to that the algorithm has a tendency to zigzag sometimes when it could have gone straight.
+Also it sometimes ends up climbing all the way to the top layer and then going back down again and continuing from there.
 One way to improve the solutions, but also increase runtime, would be to backtrack and try other possible directions, or even go a step further and try to connect gates in different orders to further optimize the result.
 
 
