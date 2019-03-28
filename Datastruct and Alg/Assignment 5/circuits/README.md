@@ -8,7 +8,8 @@ This program does not work perfectly yet. Problems arise when gates are enclosed
 One possible solution was to increase the cost of places next to gates, this gave a small improvement but did not fix it completely.
 Next to that the algorithm has a tendency to zigzag sometimes when it could have gone straight.
 Also it sometimes ends up climbing all the way to the top layer and then going back down again and continuing from there.
-One way to improve the solutions, but also increase runtime, would be to backtrack and try other possible directions, or even go a step further and try to connect gates in different orders to further optimize the result.
+One way to improve the solutions, but also increase runtime, would be to backtrack and try other possible directions.
+It was tried to connect the gates from smallest to largest distance between the gates, but this gave worse results. Going through every possible permutation might give a better result.
 
 
 ## Content
