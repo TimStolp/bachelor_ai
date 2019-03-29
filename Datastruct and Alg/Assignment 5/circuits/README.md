@@ -5,9 +5,7 @@ In the __main__.py file you can adjust some settings to print the results of eac
 
 ## Results
 This program does not work perfectly yet. Problems arise when gates are enclosed by previous wires and various attempts to counteract this failed.
-One possible solution was to increase the cost of places next to gates, this gave a small improvement but did not fix it completely.
-Next to that the algorithm has a tendency to zigzag sometimes when it could have gone straight.
-Also it sometimes ends up climbing all the way to the top layer and then going back down again and continuing from there.
+One possible solution was to increase the cost of places next to gates, this either was not implemented correctly or did not work.
 One way to improve the solutions, but also increase runtime, would be to backtrack and try other possible directions.
 It was tried to connect the gates from smallest to largest distance between the gates, but this gave worse results. Going through every possible permutation might give a better result.
 
@@ -20,7 +18,6 @@ Creates board class which contains information about the type of board and a lis
 ### netlist.py
 Creates netlist class which stores a circuit board as numpy array, a pandas data frame of gate coordinates, and a pandas data frame of gate connections.
 Contains function to solve the gate connections using the a* algorithm.
-The circuit boards have a Z dimension of 5 as this resulted in the best overal score. If more layers are added they will end up being used but give worse outcomes.
 
 ### node.py
 Creates node class which contains information about each node in a path from gate to gate.

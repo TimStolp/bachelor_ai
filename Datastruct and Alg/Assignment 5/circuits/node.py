@@ -10,7 +10,6 @@ class Node(object):
         self.parent_ = parent
         self.coords_ = coords
 
-        self.len_ = -1
         self.g_ = 0
         self.h_ = 0
         self.f_ = 0
@@ -35,10 +34,6 @@ class Node(object):
         """ Returns node's parent. """
         return self.parent_
 
-    def len(self):
-        """ Returns length from start node to this node. """
-        return self.len_
-
     def update_f(self, new_f):
         """ Update f value. """
         self.f_ = new_f
@@ -53,5 +48,4 @@ class Node(object):
 
     def update_parent(self, new_parent):
         """ Update parent and length to this node. """
-        self.len_ = new_parent.len() + 1
         self.parent_ = new_parent

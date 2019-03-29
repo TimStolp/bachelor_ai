@@ -9,5 +9,5 @@ board1.solve_netlists(printresults=True)
 board2.solve_netlists(printresults=True)
 
 # Print the circuit board of the netlists.
-board1.print_netlists()
-# board2.print_netlists()
+# board1.print_netlists()
+board2.print_netlists()

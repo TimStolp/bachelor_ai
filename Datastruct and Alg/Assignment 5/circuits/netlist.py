@@ -14,7 +14,7 @@ class Netlist(object):
         """ Initialize the variables of this class. """
         self.netlist_frame = netlist_frame
         self.gates = gates_frame
-        self.dimensions = (5,) + (dimensions[1],) + (dimensions[0],)
+        self.dimensions = (7,) + (dimensions[1],) + (dimensions[0],)
 
         self.circuit = np.chararray(self.dimensions, unicode=True, itemsize=2)
         for layer in self.circuit:
@@ -53,16 +53,15 @@ class Netlist(object):
         Get neighbours of coordinates.
         Returns list of nodes of valid neighbours.
         """
-        (z, y, x) = coord
+        (z, y, x) = coord.coords()
 
         neighbours_coords = [(z + 1, y, x), (z, y, x + 1), (z, y, x - 1), (z, y + 1, x), (z, y - 1, x), (z - 1, y, x)]
         neighbours = []
 
         for neighbour in neighbours_coords:
-
             # If neighbour is the goal, return a list of only this neighbour.
             if self.cmp(neighbour, goal):
-                return [node.Node(None, neighbour)]
+                return [node.Node(coord, neighbour)]
 
             if any(ax < 0 for ax in neighbour):
                 continue
@@ -75,7 +74,11 @@ class Netlist(object):
             if self.in_visited(neighbour, visited):
                 continue
 
-            neighbours.append(node.Node(None, neighbour))
+            if not self.cmp(neighbour, goal):
+                if self.get_cell(neighbour) != "__":
+                    continue
+
+            neighbours.append(node.Node(coord, neighbour))
 
         return neighbours
 
@@ -87,9 +90,9 @@ class Netlist(object):
                 self.circuit[z][y][x] = f"{i:02d}"
             end_node = end_node.parent()
 
-    def manh_dist(self, a, b):
-        """ Calculates Manhattan distance between 2 tuples with 3 values. """
-        return abs(a[0] - b[0]) + abs(a[1] - b[1]) + abs(a[2] - b[2])
+    def euc_dist(self, a, b):
+        """ Calculates Euclidean distance between 2 tuples with 3 values. """
+        return (a[0] - b[0])**2 + (a[1] - b[1])**2 + (a[2] - b[2])**2
 
     def cmp(self, a, b):
         """ Returns true if 2 tuples with 3 values are the same. """
@@ -105,17 +108,6 @@ class Netlist(object):
             if self.cmp(coords, v):
                 return True
 
-    def update_score(self, n, goal):
-        """ Checks how many gates are around a node making this node more expensive for each gate. """
-        neighbours = self.get_neighbours(n.coords(), [], goal)
-        if self.cmp(neighbours[0].coords(), goal):
-            return 0
-        i = 0
-        for neighbour in neighbours:
-            if self.get_cell(neighbour.coords()) == "GA":
-                i += 2
-        return i
-
     def find_best_node(self, neighbours):
         """ Find optimal next node. """
         new_node = neighbours[0]
@@ -123,6 +115,24 @@ class Netlist(object):
             if n.f() < new_node.f():
                 new_node = n
         return new_node
+
+    def update_cost(self, n):
+        (z, y, x) = n.coords()
+
+        i = 0
+        neighbours_coords = [(z + 1, y, x), (z, y, x + 1), (z, y, x - 1), (z, y + 1, x), (z, y - 1, x), (z - 1, y, x)]
+        for neighbour in neighbours_coords:
+            if any(ax < 0 for ax in neighbour):
+                continue
+
+            if neighbour[0] >= self.dimensions[0] or \
+               neighbour[1] >= self.dimensions[1] or \
+               neighbour[2] >= self.dimensions[2]:
+                continue
+
+            if self.get_cell(neighbour) == "GA":
+                i += 1
+        return i
 
     def astar(self, current, goal, visited):
         """ Connects start and goal node recursively using the a* algorithm. """
@@ -132,26 +142,18 @@ class Netlist(object):
         if not self.in_visited(current.coords(), visited):
             visited.append(current.coords())
 
-        neighbours = self.get_neighbours(current.coords(), visited, goal.coords())
+        neighbours = self.get_neighbours(current, visited, goal.coords())
 
         # Return 1 if stuck
         if not neighbours:
             return 1
 
         for n in neighbours:
-            # Delete invalid neighbours
-            if not self.cmp(n.coords(), goal.coords()):
-                if not self.get_cell(n.coords()) == "__":
-                    neighbours.remove(n)
-            # Return 1 if stuck
-            if not neighbours:
-                return 1
-            n.update_g(current.len() + 1)
-            n.update_h(self.manh_dist(n.coords(), goal.coords()) + self.update_score(n, goal.coords()))
+            n.update_g(current.g() + 1)
+            n.update_h(self.euc_dist(n.coords(), goal.coords()))
             n.update_f(n.g() + n.h())
 
         new_node = self.find_best_node(neighbours)
-        new_node.update_parent(current)
 
         # Recursively call astar() with new next node.
         return self.astar(new_node, goal, visited)
@@ -164,7 +166,23 @@ class Netlist(object):
                 for cell in row:
                     if cell != "__" and cell != "GA":
                         i += 1
-        return (self.dimensions[0] * self.dimensions[1] * self.dimensions[2]) - i
+        return i
+
+    def cleanup_layers(self):
+        """ Removes unused layers. """
+        i = 0
+        for index, layer in enumerate(self.circuit):
+            if self.check_empty(layer):
+                i += 1
+        self.circuit = self.circuit[:7-i]
+
+    def check_empty(self, layer):
+        """ Checks if layer is empty. """
+        for row in layer:
+            for cell in row:
+                if cell != "__":
+                    return False
+        return True
 
     def connect_gates(self):
         """
@@ -183,7 +201,7 @@ class Netlist(object):
             else:
                 times_failed += 1
             i += 1
-
+        self.cleanup_layers()
         return self.get_total_length(), times_failed
 
     def __str__(self):
