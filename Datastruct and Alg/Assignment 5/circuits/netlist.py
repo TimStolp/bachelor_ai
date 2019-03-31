@@ -276,7 +276,6 @@ class Netlist(object):
         if new < paths_failed:
             paths_failed = new
             self.paths = paths
-            print(paths_failed)
         return paths_failed
 
     def handle_not_found(self, paths, end_node, goal_node, count_list, counter, current, queue, avoid_gates):
