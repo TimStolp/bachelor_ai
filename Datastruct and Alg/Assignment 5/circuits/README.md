@@ -3,11 +3,45 @@
 To run the program you run \_\_main\_\_.py.
 In the \_\_main\_\_.py file you can adjust some settings to print the results of each solved netlist or print the netlist's circuit board.
 
-## Results
-This program does not work perfectly yet. Problems arise when gates are enclosed by previous wires and various attempts to counteract this failed.
+## Overview
+This program does not work perfectly yet. Problems arise when gates are enclosed by previous wires.
 One possible solution was to increase the cost of places next to gates, this either was not implemented correctly or did not work.
-One way to improve the solutions, but also increase runtime, would be to backtrack and try other possible directions.
-It was tried to connect the gates from smallest to largest distance between the gates, but this gave worse results. Going through every possible permutation might give a better result.
+Gates were connected from smallest to largest distance between the gates which gave a little better results. Going through every possible permutation might give an even better result.
+When collisions were found the wire with which the current connection collisioned got undrawed and the current connection was tried again.
+A limiter was implemented to prevent wires from infinitely collisioning into eachother. When this limit is reached it undraws a random other wire and tries again.
+Meanwhile the amount of times a* is ran is kept track of, the final solution allows for 'number of a* cycles divided by 10000' unsolved paths to prevent infinitely redrawing random wires.
+This number can be changed to allow the program to try redrawing wires for longer to search for better solutions.
+10000 was chosen as this gave a decent value per time result.
+
+## Results
+Priority was given to connecting as many gates over getting the shortest length.
+### Board 1
+
+Netlist1
+Total length = 376
+Connections failed = 1
+
+Netlist2
+Total length = 600
+Connections failed = 1
+
+Netlist3
+Total length = 492
+Connections failed = 12
+
+### Board 2
+
+Netlist1
+Total length = 747
+Connections failed = 11
+
+Netlist2
+Total length = 713
+Connections failed = 14
+
+Netlist3
+Total length = 685
+Connections failed = 26
 
 
 ## Content
