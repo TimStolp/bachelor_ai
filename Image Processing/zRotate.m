@@ -4,4 +4,3 @@ function output = zRotate(phi,vectors)
 vectors = reshape(vectors, [], 3);
 output = rot(phi)*vectors;
 end
-

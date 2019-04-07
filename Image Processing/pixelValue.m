@@ -5,7 +5,7 @@ if inImage(size(image),x,y)
     switch(method)
         case 'nearest'
             % Do nearest neighbour
-            color = image(round(x), round(y));
+            color = image(round(y), round(x));
             return;
         case 'linear'
             % Do bilinear interpolation
@@ -22,5 +22,5 @@ if inImage(size(image),x,y)
     end %end switch
 else
     % return a constant
-    color = -1;
+    color = 0;
 end
