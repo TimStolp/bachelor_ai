@@ -14,6 +14,11 @@ if inImage(size(image),x,y)
             a = x - fx;
             b = y - fy;
             % Get image values while dealing with border problem.
+            % Padding with 0s gives black border on 2 edges
+            % Padding with looping picture gives an odd jump in grey value on 2 edges
+            % Padding with the closest value seems to give the best result
+            % as the border doesn't look like it has oddities using this
+            % method.
             [f1, f2, f3, f4] = getPixelValue(image, size(image), fx, fy);
             color = (1-a) * (1-b) * f1 + ...
                     a * (1-b) * f2 + ...

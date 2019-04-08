@@ -24,4 +24,6 @@ end
 rotatedImage = cast(reshape(rotatedImage, [new_y, new_x]), 'double');
 rotatedImage = rotatedImage / max(max(rotatedImage));
 toc()
+
+
 end
