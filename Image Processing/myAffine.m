@@ -3,6 +3,7 @@ r = zeros (N , M ); % allocate new image of correct size
 % calculate X
 A = [ x1 , y1 , 1; x2 , y2 , 1; x3 , y3 , 1]';
 B = [ 1 , 1 ; M , 1 ; 1 , N ]';
+% B = [ xx1 , yy1 ; xx2 , yy2 ; xx3 , yy3 ]';
 X = B / A ;
 
 % [rows, cols] = find(zeros(M, N)==0);

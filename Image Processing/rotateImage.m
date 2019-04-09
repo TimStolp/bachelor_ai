@@ -5,8 +5,8 @@ R = rot2d(angle);
 
 % Obtain indices needed for interpolation
 sizeImage = size(image);
-new_x = ceil(round(abs(sizeImage(1) * sin(angle)) + abs(sizeImage(2) * cos(angle)), 5));
-new_y = ceil(round(abs(sizeImage(1) * cos(angle)) + abs(sizeImage(2) * sin(angle)), 5));
+new_x = ceil(abs(sizeImage(1) * sin(angle)) + abs(sizeImage(2) * cos(angle)));
+new_y = ceil(abs(sizeImage(1) * cos(angle)) + abs(sizeImage(2) * sin(angle)));
 offset1 = (new_y-sizeImage(1))/2;
 offset2 = (new_x-sizeImage(2))/2;
 center = [new_y/2; new_x/2];
