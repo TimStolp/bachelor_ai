@@ -1,5 +1,6 @@
 function rotatedImage = rotateImage(image, angle, method)
 tic()
+image = im2double(image);
 % Create the necessary rotation matrix
 R = rot2d(angle);
 
@@ -13,17 +14,17 @@ center = [new_y/2; new_x/2];
 [rows, cols] = find(zeros(new_y, new_x)==0);
 coordinateMatrix = [rows'; cols'];
 
-% Obtain colors for the whole rotatedImage matrix
+% Rotate image
 rotatedMatrix = (R*(coordinateMatrix-center)+center);
+% Obtain colors for the whole rotatedImage matrix
+rotatedImage = zeros(1, new_y*new_x);
 for column = 1 : size(cols)
     c = rotatedMatrix(:,column);
     rotatedImage(:,column) = pixelValue(image, c(2)-offset2, c(1)-offset1, method);
 end
 
 % using the specified interpolation method
-rotatedImage = cast(reshape(rotatedImage, [new_y, new_x]), 'double');
+rotatedImage = reshape(rotatedImage, [new_y, new_x]);
 rotatedImage = rotatedImage / max(max(rotatedImage));
 toc()
-
-
 end
