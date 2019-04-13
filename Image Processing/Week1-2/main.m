@@ -62,7 +62,7 @@ subPlotFaces(transformedCube)
 %% 8.1 Place 3 cubes on different views of calibration image.
 mat = load('calibrationpoints.mat');
 
-for i = 1:size(views)
+for i = 1:4
     calibration_points = load(['view',num2str(i),'.mat']);
     subplot(2,2,i), imshow(['view',num2str(i),'.jpg']), title(['view ',num2str(i),''])
     transformedCube = transformCube(1, [0,0,0], calibration_points.xy, mat.XYZ);
