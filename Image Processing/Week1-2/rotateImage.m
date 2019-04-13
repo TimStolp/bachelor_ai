@@ -1,5 +1,4 @@
 function rotatedImage = rotateImage(image, angle, method)
-tic()
 image = im2double(image);
 % Create the necessary rotation matrix
 R = rot2d(angle);
@@ -26,5 +25,4 @@ end
 % using the specified interpolation method
 rotatedImage = reshape(rotatedImage, [new_y, new_x]);
 rotatedImage = rotatedImage / max(max(rotatedImage));
-toc()
 end

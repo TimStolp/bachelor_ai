@@ -10,3 +10,6 @@ z = zeros ( size ( x ));
 Aoddrows = [x , y , o , z , z , z , -u .* x , -u .* y , -u ];
 Aevenrows = [z , z , z , x , y , o , -v .* x , -v .* y , -v ];
 A = [ Aoddrows ; Aevenrows ];
+projMatrix = null(A);
+projMatrix = reshape(projMatrix, [3,3])';
+end

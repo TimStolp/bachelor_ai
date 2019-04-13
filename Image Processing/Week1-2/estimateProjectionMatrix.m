@@ -15,5 +15,5 @@ A = [ Aoddrows ; Aevenrows ];
 [U , D , V ] = svd ( A );
 projMatrix = V (: , end );
 % reshape m into the 3 x4 projection matrix M
-projMatrix = reshape (projMatrix , 3 , 4)';
+projMatrix = reshape (projMatrix , 4 , 3)';
 end
