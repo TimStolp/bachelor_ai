@@ -19,15 +19,14 @@ mesh(Gauss(3))
 
 %% Time Gaussian on different scales
 a = imread('peppers.png');
-times = zeros(100,20);
-for sigma = 1:20
+times = zeros(10,200);
+for sigma = 1:200
     disp(sigma)
-    for i = 1:100
+    for i = 1:10
         tic;
         H = imfilter(a, Gauss(sigma), 'conv', 'replicate');
         times(i,sigma) = toc;
     end
-    imshow(H)
 end
 mean(times)
 plot(mean(times))
@@ -49,17 +48,80 @@ pixels = 384*512*3
 %% Time seperated Gaussian on different scales
 
 a = imread('peppers.png');
-times = zeros(100,20);
-for sigma = 1:20
+times = zeros(10,200);
+for sigma = 1:200
     disp(sigma)
-    for i = 1:100
+    for i = 1:10
         tic;
         f = Gauss1(sigma);
         H = imfilter(a, f, 'conv', 'replicate');
         H = imfilter(H, f', 'conv', 'replicate');
         times(i,sigma) = toc;
     end
-    imshow(H)
 end
 mean(times)
 plot(mean(times))
+
+%% gD test
+f = imread('cameraman.tif');
+fx = gD(f, 1, 1, 0);
+fy = gD(f, 1, 0, 1);
+fxx = gD(f, 1, 2, 0);
+fyy = gD(f, 1, 0, 2);
+fxy = gD(f, 1, 1, 1);
+
+subplot(2,3,1), imshow(f, []), title('f')
+subplot(2,3,2), imshow(fx, []), title('fx')
+subplot(2,3,3), imshow(fy, []), title('fy')
+subplot(2,3,4), imshow(fxx, []), title('fxx')
+subplot(2,3,5), imshow(fyy, []), title('fyy')
+subplot(2,3,6), imshow(fxy, []), title('fxy')
+
+%% cos and sin function
+x = -100:100;
+y = -100:100;
+[X , Y ] = meshgrid (x , y );
+A = 1; B = 2; V = 6* pi /201; W = 4* pi /201;
+F = A * sin ( V * X ) + B * cos ( W * Y );
+Fx = V * A * cos ( V * X );
+Fy = -W * B * sin ( W * Y );
+subplot(1,3,1), imshow (F , [] , 'xData' , x , 'yData' , y ), title('F')
+subplot(1,3,2), imshow (Fx , [] , 'xData' , x , 'yData' , y ), title('Fx')
+subplot(1,3,3), imshow (Fy , [] , 'xData' , x , 'yData' , y ), title('Fy')
+
+%% Image with vectors (Run "cos and sin function" block before this)
+xx = -100:10:100;
+yy = -100:10:100;
+[ XX , YY ] = meshgrid ( xx , yy );
+Fx = V * A * cos ( V * XX );
+Fy = -W * B * sin ( W * YY );
+imshow (F , [] , 'xData' , xx , 'yData' , yy );
+hold on ;
+quiver ( xx , yy , Fx , Fy , 'r' );
+hold off ;
+
+%% Gaussian vector plot (Run "cos and sin function" block before this)
+xx = -100:10:100;
+yy = -100:10:100;
+[ XX , YY ] = meshgrid ( xx , yy );
+Gx = gD(F, 1, 1, 0);
+Gy = gD(F, 1, 0, 1);
+imshow (F , [] , 'xData' , xx , 'yData' , yy );
+hold on ;
+quiver ( xx , yy , Gx(1:10:end,1:10:end) , Gy(1:10:end,1:10:end) , 'r' );
+hold off ;
+
+%% Rotated image (Run "cos and sin function" block before this)
+RF = rotateImage(F, pi/18, 'linear');
+[s1, s2] = size(RF);
+RGx = gD(RF, 1, 1, 0);
+RGy = gD(RF, 1, 0, 1);
+imshow (RF , [] , 'xData' , 1:10:s1 , 'yData' , 1:10:s2 );
+hold on ;
+quiver ( 1:10:s1 , 1:10:s2 , RGx(1:10:end,1:10:end) , RGy(1:10:end,1:10:end) , 5, 'r');
+hold off ;
+
+%% Use canny edge detector
+a = imread('cameraman.tif');
+cannied = canny(a, 1);
+imshow(cannied, [])
